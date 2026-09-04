@@ -6,6 +6,14 @@ An artificial neural network trained on the Car Dekho dataset to classify vehicl
 
 [Open the full evaluation dashboard](ann_dashboard.html)
 
+### Desktop View
+
+![ANN dashboard desktop view](ann_artifacts/dashboard-desktop.png)
+
+### Mobile View
+
+![ANN dashboard mobile view](ann_artifacts/dashboard-mobile.png)
+
 ![ANN evaluation output](ann_artifacts/evaluation.png)
 
 The model achieved 86.9% test accuracy, matching the majority-class baseline. Because the test set contains no correctly identified Automatic vehicles, accuracy should be interpreted alongside the class balance and ROC-AUC of 0.542.
