@@ -1,0 +1,19 @@
+ANN binary classification
+============================
+dataset: car data.csv
+rows: 301
+features: ['Year', 'Selling_Price', 'Present_Price', 'Kms_Driven', 'Fuel_Type', 'Seller_Type', 'Owner']
+positive_label: Automatic transmission
+class_distribution: {0: 261, 1: 40}
+test_accuracy: 0.8688524590163934
+majority_baseline_accuracy: 0.8688524590163934
+test_roc_auc: 0.5424528301886792
+confusion_matrix: [[53, 0], [8, 0]]
+classification_report:               precision    recall  f1-score   support
+
+      Manual       0.87      1.00      0.93        53
+   Automatic       0.00      0.00      0.00         8
+
+    accuracy                           0.87        61
+   macro avg       0.43      0.50      0.46        61
+weighted avg       0.75      0.87      0.81        61

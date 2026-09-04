@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANN / transmission classifier</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    :root {
+      --ink: #182326;
+      --muted: #667477;
+      --paper: #f5f7f3;
+      --panel: #ffffff;
+      --line: #dbe2dc;
+      --lime: #d9f36b;
+      --coral: #ff765f;
+      --teal: #1d7771;
+      --shadow: 0 12px 35px rgba(24, 35, 38, .07);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: 'Space Grotesk', sans-serif; }
+    body::before { content: ''; display: block; height: 7px; background: var(--ink); }
+    .shell { max-width: 1240px; margin: 0 auto; padding: 28px 28px 60px; }
+    header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; margin-bottom: 42px; }
+    .kicker, .eyebrow { color: var(--teal); font: 500 12px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { max-width: 680px; margin: 12px 0 0; font-size: clamp(2.7rem, 6vw, 5.5rem); line-height: .92; letter-spacing: -.055em; font-weight: 600; }
+    .dek { max-width: 390px; margin: 6px 0 0; color: var(--muted); line-height: 1.55; font-size: 15px; }
+    .status { display: inline-flex; align-items: center; gap: 9px; padding: 10px 13px; border: 1px solid var(--line); background: var(--panel); font: 500 12px 'DM Mono', monospace; white-space: nowrap; }
+    .status i { width: 8px; height: 8px; display: block; border-radius: 50%; background: var(--teal); }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .metric { min-height: 150px; padding: 20px; border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); }
+    .metric.primary { background: var(--lime); border-color: var(--ink); }
+    .metric .label { color: var(--muted); font: 500 11px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
+    .metric.primary .label { color: var(--ink); }
+    .metric strong { display: block; margin-top: 27px; font-size: 42px; font-weight: 600; letter-spacing: -.06em; }
+    .metric small { display: block; margin-top: 6px; color: var(--muted); }
+    .metric.primary small { color: var(--ink); }
+    .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
+    .panel { padding: 24px; border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); }
+    .panel h2 { margin: 7px 0 22px; font-size: 22px; letter-spacing: -.035em; }
+    .panel-head { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+    .mono { font: 12px 'DM Mono', monospace; color: var(--muted); }
+    .balance-row { margin: 20px 0; }
+    .balance-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+    .track { height: 16px; background: #edf0eb; overflow: hidden; }
+    .fill { height: 100%; background: var(--teal); }
+    .fill.coral { background: var(--coral); }
+    .callout { margin-top: 25px; padding: 16px; border-left: 4px solid var(--coral); background: #fff5f1; line-height: 1.5; font-size: 14px; }
+    .matrix { display: grid; grid-template-columns: 92px 1fr 1fr; gap: 5px; margin-top: 25px; font-size: 13px; text-align: center; }
+    .matrix > div { min-height: 67px; display: grid; place-items: center; padding: 8px; background: #eef3ed; }
+    .matrix .axis { min-height: 30px; background: transparent; color: var(--muted); font: 11px 'DM Mono', monospace; }
+    .matrix .corner { background: transparent; }
+    .matrix .good { background: #d9f1dc; font-size: 21px; font-weight: 600; }
+    .matrix .bad { background: #ffe0d8; color: #a23d2d; font-size: 21px; font-weight: 600; }
+    .chart { width: 100%; margin-top: 18px; border: 1px solid var(--line); }
+    .details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 26px; margin-top: 20px; }
+    .detail { padding: 12px 0; border-top: 1px solid var(--line); }
+    .detail b { display: block; margin-top: 6px; font-size: 14px; font-weight: 500; }
+    footer { display: flex; justify-content: space-between; margin-top: 20px; color: var(--muted); font: 11px 'DM Mono', monospace; }
+    @media (max-width: 800px) { .shell { padding: 24px 16px 40px; } header { display: block; margin-bottom: 30px; } .status { margin-top: 24px; } .metrics { grid-template-columns: 1fr 1fr; } .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 430px) { .metrics { grid-template-columns: 1fr; } .metric { min-height: 120px; } .metric strong { margin-top: 18px; } .details { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <div class="kicker">Model evaluation / 01</div>
+        <h1>Transmission,<br>classified.</h1>
+      </div>
+      <div>
+        <div class="status"><i></i> RUN COMPLETE · 03 SEP 2026</div>
+        <p class="dek">A feed-forward artificial neural network trained on the compact Car Dekho dataset to identify automatic transmissions.</p>
+      </div>
+    </header>
+
+    <section class="metrics" aria-label="Key metrics">
+      <article class="metric primary"><div class="label">Test accuracy</div><strong>86.9%</strong><small>61 held-out rows</small></article>
+      <article class="metric"><div class="label">ROC-AUC</div><strong>0.542</strong><small>near random separation</small></article>
+      <article class="metric"><div class="label">Dataset</div><strong>301</strong><small>total car records</small></article>
+      <article class="metric"><div class="label">Baseline</div><strong>86.9%</strong><small>majority-class accuracy</small></article>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <div class="eyebrow">01 / Label balance</div>
+        <div class="panel-head"><h2>What the model saw</h2><span class="mono">n = 301</span></div>
+        <div class="balance-row"><div class="balance-label"><span>Manual</span><b>261 · 86.7%</b></div><div class="track"><div class="fill" style="width:86.7%"></div></div></div>
+        <div class="balance-row"><div class="balance-label"><span>Automatic</span><b>40 · 13.3%</b></div><div class="track"><div class="fill coral" style="width:13.3%"></div></div></div>
+        <div class="callout"><b>Read the accuracy carefully.</b><br>The ANN matches the majority baseline, but it missed all 8 Automatic cars in the test set. The class imbalance is the central limitation of this run.</div>
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">02 / Error profile</div>
+        <div class="panel-head"><h2>Confusion matrix</h2><span class="mono">test set · n = 61</span></div>
+        <div class="matrix" aria-label="Confusion matrix">
+          <div class="corner"></div><div class="axis">PRED. MANUAL</div><div class="axis">PRED. AUTO</div>
+          <div class="axis">ACTUAL<br>MANUAL</div><div class="good">53</div><div class="bad">0</div>
+          <div class="axis">ACTUAL<br>AUTO</div><div class="bad">8</div><div class="bad">0</div>
+        </div>
+        <div class="details">
+          <div class="detail"><span class="mono">Manual recall</span><b>100%</b></div>
+          <div class="detail"><span class="mono">Automatic recall</span><b>0%</b></div>
+          <div class="detail"><span class="mono">Hidden layers</span><b>32 → 16 neurons</b></div>
+          <div class="detail"><span class="mono">Activation</span><b>ReLU / Adam</b></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">03 / Evaluation plot</div>
+        <div class="panel-head"><h2>ROC curve</h2><span class="mono">AUC 0.542</span></div>
+        <img class="chart" src="ann_artifacts/evaluation.png" alt="Generated confusion matrix and ROC curve evaluation plot">
+      </article>
+
+      <article class="panel">
+        <div class="eyebrow">04 / Run manifest</div>
+        <h2>Training setup</h2>
+        <div class="details">
+          <div class="detail"><span class="mono">Source</span><b>car data.csv</b></div>
+          <div class="detail"><span class="mono">Split</span><b>80 / 20 stratified</b></div>
+          <div class="detail"><span class="mono">Inputs</span><b>7 cleaned features</b></div>
+          <div class="detail"><span class="mono">Preprocessing</span><b>Scaled + one-hot encoded</b></div>
+          <div class="detail"><span class="mono">Target</span><b>Transmission = Automatic</b></div>
+          <div class="detail"><span class="mono">Random state</span><b>42</b></div>
+        </div>
+      </article>
+    </section>
+    <footer><span>ANN BINARY CLASSIFICATION</span><span>LOCAL EVALUATION DASHBOARD</span></footer>
+  </main>
+</body>
+</html>
